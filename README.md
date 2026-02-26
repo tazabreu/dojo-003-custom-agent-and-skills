@@ -1,91 +1,56 @@
-# Dojo 003 — Custom Agents and Skills
+# Dojo 003 — Custom Agents, Skills & Background Agents
 
-This repository is a **dojo coding exercise** in which we build **GitHub Copilot custom agents** with specific, repeatable prompts defined at the team level, plus the ability to explicitly use **skills** to define exactly how certain commands should be implemented.
+This repo is a dojo to experiment with how **instructions**, **custom agents**, and **skills** improve the quality and reliability of work done by **background agents**.
 
-## What are Custom Agents?
+The canonical “what are we doing today?” brief is in [INSTRUCTIONS.html](INSTRUCTIONS.html).
 
-Custom agents are Markdown-based profiles (`.agent.md`) that tailor Copilot's expertise for specific tasks. Each agent profile declares a name, description, available tools, and a detailed prompt that shapes the agent's behavior.
+## Goals (from INSTRUCTIONS.html)
 
-You can create agents at the **repository**, **organization**, or **personal** level, and they are available wherever Copilot coding agent runs — in your IDE, the GitHub CLI, or on github.com.
+1. Experiment with key primitives: **instructions**, **custom agents**, and **skills**.
+2. Automate a recurring task (e.g., scaffolding web pages, API endpoints, or data-pipeline test structures).
+3. Validate how these primitives improve **background agents** capabilities.
 
-> **Reference:** [Creating custom agents for Copilot coding agent](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-custom-agents)
+## Agenda
 
-## What are Agent Skills?
+- Watch a quick demo of the expected output (5 min)
+- Breakout sessions (40 min)
+  - Pick a recurring task from your team’s workflow.
+  - Build a small **agent** (standards/guidelines to reach a goal) paired with a **skill** (concrete, repeatable implementation steps).
+  - If time permits, run it from **GitHub.com** using background-agent capabilities.
+- Regroup and share insights (10 min)
 
-Agent skills are folders of instructions, scripts, and resources that Copilot can load when relevant to improve its performance on specialized tasks. Skills live in your repository (`.github/skills` or `.claude/skills`) or in your home directory (`~/.copilot/skills` or `~/.claude/skills`).
+## How to Use This Repo
 
-Skills let you teach Copilot to perform tasks in a **specific, repeatable way** — for example, how to scaffold a new page, how to create a data pipeline with embedded tests, or how to wire up a new API endpoint.
+### 1) Start from instructions (not from example code)
 
-> **Reference:** [About agent skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)
+- Repo-level guardrails live in `.github/copilot-instructions.md`.
+- Skills live under `.github/skills/<skill-name>/SKILL.md`.
+- Agent profiles (if used) live under `.github/agents/*.agent.md`.
 
-## Objectives
+The intent is: encode conventions once, then let background agents apply them consistently.
 
-1. **Build custom agents** with team-level prompts that encode our conventions and standards.
-2. **Create skills** that define exactly how recurring tasks should be implemented.
-3. **Try agents locally** in the IDE (VS Code, JetBrains, etc.) and via the GitHub Copilot CLI.
-4. **Try agents from GitHub** as a background coding agent that opens pull requests autonomously.
+### 2) Pick one “recurring task” and make it reproducible
 
-## Use Cases
+Good candidates usually have:
 
-We will exercise these custom agents on repeatable tasks such as:
+- Clear inputs/outputs (e.g., “add an endpoint + tests + docs”)
+- A stable structure (folders, naming, architectural boundaries)
+- Easy verification (tests, linters, or a “definition of done” checklist)
 
-- **A new page on a web portal** — scaffold a frontend page with routing, components, and tests following our conventions.
-- **A new data pipeline with embedded automated tests** — generate ingestion, transformation, and validation steps with built-in test coverage.
-- **A new API endpoint in an existing system** — add route, controller, service, and integration tests using our established patterns.
+### 3) Validate the impact
 
-## Repository Structure
+Compare outcomes with and without the instructions/agent/skill:
 
-```
-.
-├── README.md
-├── backend/              # API and backend services
-├── frontend/             # Web portal / UI application
-├── data-pipelines/       # Data ingestion and transformation pipelines
-└── examples/
-    └── clean-architecture-and-cassandra-expert/
-        ├── .github/
-        │   ├── agents/   # Custom agent profile (.agent.md)
-        │   └── skills/   # Agent skills (e.g. cassandra-migrations)
-        ├── src/           # FastAPI + Cassandra clean-architecture app
-        ├── tests/
-        │   ├── unit/      # Isolated domain & use-case tests
-        │   └── functional/# FR tests with spec-as-docstring pattern
-        ├── scripts/       # Migration runner, Cassandra reset helpers
-        └── docker-compose.yml
-```
+- Fewer back-and-forth clarifications
+- More consistent structure and naming
+- Better test coverage and edge-case handling
+- Higher success rate for background-agent PRs
 
-## Examples
+## About `_examples/`
 
-### `clean-architecture-and-cassandra-expert`
+`_examples/` contains generated apps used to exercise the dojo concepts. They are **not the goal** of this repository; they’re just convenient sandboxes for testing instructions, agents, and skills.
 
-A complete working example that demonstrates:
+## References
 
-- **Custom agent** (`.github/agents/clean-architecture-and-cassandra-expert.agent.md`) — encodes team conventions for building Python/FastAPI services backed by Cassandra with clean architecture layering.
-- **Agent skill** (`.github/skills/cassandra-migrations/SKILL.md`) — teaches the agent how to create versioned CQL migrations, reset the Docker database, and redeploy Cassandra from scratch.
-- **FR-as-docstring testing pattern** — functional requirements are written as concise Python docstrings (inspired by [spec-kit](https://github.com/github/spec-kit) and [OpenSpec](https://github.com/Fission-AI/OpenSpec)) directly inside `tests/functional/test_fr_*.py` files, making each test file the single source of truth for its requirement.
-- **uv** for dependency management, **Docker Compose** for Cassandra, **pytest** for both unit and FR tests.
-
-#### Quick start
-
-```bash
-cd examples/clean-architecture-and-cassandra-expert
-
-# Set up the Python environment
-uv sync --all-extras
-
-# Start Cassandra and run migrations
-scripts/reset-cassandra.sh
-
-# Run unit tests (no Docker needed)
-uv run pytest tests/unit -v
-
-# Run functional requirement tests (requires Cassandra)
-uv run pytest tests/functional -v
-
-# Start the API server
-uv run uvicorn src.api.main:app --reload
-```
-
-## Getting Started
-
-> _More agent profiles and skills will be added as the dojo progresses._
+- Creating custom agents: https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/create-custom-agents
+- About agent skills: https://docs.github.com/en/copilot/concepts/agents/about-agent-skills

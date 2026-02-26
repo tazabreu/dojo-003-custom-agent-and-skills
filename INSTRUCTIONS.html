@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dojo #3 — Custom Agents, Skills &amp; Background Agents</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #fafafa;
+    color: #222;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 56px 72px 48px;
+    font-size: 18px;
+    line-height: 1.6;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Top title block                                                     */
+  /* ------------------------------------------------------------------ */
+  .title-block {
+    margin-bottom: 52px;
+  }
+  .title-block h1 {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: rgb(214, 0, 43);
+    letter-spacing: -0.01em;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Two-column layout                                                   */
+  /* ------------------------------------------------------------------ */
+  .columns {
+    display: flex;
+    gap: 56px;
+    flex: 1;
+  }
+  .col-left  { flex: 1; min-width: 0; }
+  .col-right { flex: 2; min-width: 0; }
+
+  /* ------------------------------------------------------------------ */
+  /* Card / section boxes                                                */
+  /* ------------------------------------------------------------------ */
+  .card {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 32px 32px 28px;
+    height: 100%;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .card-header {
+    font-size: 20px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #222;
+    margin-bottom: 26px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid rgb(214, 0, 43);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* Goals bullets (left column) — numbered circles                      */
+  /* ------------------------------------------------------------------ */
+  .goals-list {
+    list-style: none;
+    counter-reset: goal;
+  }
+  .goals-list li {
+    counter-increment: goal;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 24px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: #444;
+  }
+  .goals-list li::before {
+    content: counter(goal);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: rgb(214, 0, 43);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 2px;
+  }
+  .goals-list li span {
+    flex: 1;
+    min-width: 0;
+  }
+  .goals-list li strong { color: #222; font-weight: 600; }
+
+  /* ------------------------------------------------------------------ */
+  /* Agenda items (right column)                                         */
+  /* ------------------------------------------------------------------ */
+  .agenda { display: flex; flex-direction: column; gap: 30px; }
+
+  .agenda-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .step-circle {
+    flex-shrink: 0;
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    background: #333;
+    color: #fff;
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  .agenda-body { flex: 1; min-width: 0; }
+
+  .agenda-body .lead {
+    font-size: 18px;
+    font-weight: 600;
+    color: #222;
+    line-height: 1.5;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* Time pill */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    background: rgb(214, 0, 43);
+    color: #fff;
+  }
+
+  /* Sub-bullets */
+  .sub-list {
+    list-style: none;
+    margin-top: 14px;
+    padding-left: 0;
+  }
+  .sub-list li {
+    position: relative;
+    padding-left: 22px;
+    margin-bottom: 14px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: #444;
+  }
+  .sub-list li::before {
+    content: '';
+    position: absolute;
+    left: 2px; top: 10px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #bbb;
+  }
+  .sub-list li strong { color: #222; font-weight: 600; }
+
+  /* ------------------------------------------------------------------ */
+  /* Footer note                                                         */
+  /* ------------------------------------------------------------------ */
+  .footer-note {
+    margin-top: auto;
+    padding-top: 36px;
+    font-size: 14px;
+    color: #bbb;
+    text-align: right;
+    letter-spacing: 0.01em;
+  }
+</style>
+</head>
+<body>
+
+  <!-- ====== Title ====== -->
+  <div class="title-block">
+    <h1>Dojo #3 &mdash; a deeper dive on custom agents, skills and background agents</h1>
+  </div>
+
+  <!-- ====== Columns ====== -->
+  <div class="columns">
+
+    <!-- Left column — Goals -->
+    <div class="col-left">
+      <div class="card">
+        <div class="card-header">Goals of this Dojo</div>
+        <ol class="goals-list">
+          <li><span>Experiment with key primitives: <strong>instructions</strong>, <strong>custom agents</strong>, and <strong>skills</strong></span></li>
+          <li><span><strong>Automate a recurring task</strong> &mdash; such as scaffolding web-app pages, API endpoints, or data-pipeline test structures</span></li>
+          <li><span>Validate how these primitives <strong>improve background agents</strong> capabilities</span></li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Right column — Agenda -->
+    <div class="col-right">
+      <div class="card">
+        <div class="card-header">What We'll Do Today</div>
+        <div class="agenda">
+
+          <!-- Step 1 -->
+          <div class="agenda-item">
+            <div class="step-circle"><i class="fa-solid fa-play"></i></div>
+            <div class="agenda-body">
+              <div class="lead">
+                Watch a quick demo of the expected output
+                <span class="pill">5 min</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="agenda-item">
+            <div class="step-circle"><i class="fa-solid fa-people-group"></i></div>
+            <div class="agenda-body">
+              <div class="lead">
+                Join the breakout sessions
+                <span class="pill">40 min</span>
+              </div>
+              <ul class="sub-list">
+                <li><strong>Pick a recurring task</strong> from your team's workflow that is a <strong>good candidate for automation</strong> via a custom agent or skill</li>
+                <li>Build a small <strong>agent</strong> (standards and guidelines for reaching a goal) paired with a <strong>skill</strong> (concrete steps to implement what's needed)</li>
+                <li>Time permitting, <strong>run your agent and skill</strong> directly from <strong>GitHub.com</strong> using <strong>background agents</strong></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="agenda-item">
+            <div class="step-circle"><i class="fa-solid fa-comments"></i></div>
+            <div class="agenda-body">
+              <div class="lead">
+                Regroup in plenary to share insights with the broader group
+                <span class="pill">10 min</span>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /agenda -->
+      </div><!-- /card -->
+    </div><!-- /col-right -->
+
+  </div><!-- /columns -->
+
+
+</body>
+</html>
