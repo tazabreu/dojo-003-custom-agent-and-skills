@@ -1,0 +1,39 @@
+[project]
+name = "ticker-price-api"
+version = "0.1.0"
+description = "FastAPI service for ticker price stock data backed by Apache Cassandra"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+    "cassandra-driver>=3.29",
+    "pydantic>=2.10",
+    "pydantic-settings>=2.7",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.25",
+    "httpx>=0.28",
+    "ruff>=0.9",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM", "RUF"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+markers = [
+    "unit: unit tests (no external dependencies)",
+    "functional: FR tests (require running Cassandra)",
+]

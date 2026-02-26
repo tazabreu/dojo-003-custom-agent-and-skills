@@ -38,11 +38,54 @@ We will exercise these custom agents on repeatable tasks such as:
 ```
 .
 ├── README.md
-├── backend/           # API and backend services
-├── frontend/          # Web portal / UI application
-└── data-pipelines/    # Data ingestion and transformation pipelines
+├── backend/              # API and backend services
+├── frontend/             # Web portal / UI application
+├── data-pipelines/       # Data ingestion and transformation pipelines
+└── examples/
+    └── clean-architecture-and-cassandra-expert/
+        ├── .github/
+        │   ├── agents/   # Custom agent profile (.agent.md)
+        │   └── skills/   # Agent skills (e.g. cassandra-migrations)
+        ├── src/           # FastAPI + Cassandra clean-architecture app
+        ├── tests/
+        │   ├── unit/      # Isolated domain & use-case tests
+        │   └── functional/# FR tests with spec-as-docstring pattern
+        ├── scripts/       # Migration runner, Cassandra reset helpers
+        └── docker-compose.yml
+```
+
+## Examples
+
+### `clean-architecture-and-cassandra-expert`
+
+A complete working example that demonstrates:
+
+- **Custom agent** (`.github/agents/clean-architecture-and-cassandra-expert.agent.md`) — encodes team conventions for building Python/FastAPI services backed by Cassandra with clean architecture layering.
+- **Agent skill** (`.github/skills/cassandra-migrations/SKILL.md`) — teaches the agent how to create versioned CQL migrations, reset the Docker database, and redeploy Cassandra from scratch.
+- **FR-as-docstring testing pattern** — functional requirements are written as concise Python docstrings (inspired by [spec-kit](https://github.com/github/spec-kit) and [OpenSpec](https://github.com/Fission-AI/OpenSpec)) directly inside `tests/functional/test_fr_*.py` files, making each test file the single source of truth for its requirement.
+- **uv** for dependency management, **Docker Compose** for Cassandra, **pytest** for both unit and FR tests.
+
+#### Quick start
+
+```bash
+cd examples/clean-architecture-and-cassandra-expert
+
+# Set up the Python environment
+uv sync --all-extras
+
+# Start Cassandra and run migrations
+scripts/reset-cassandra.sh
+
+# Run unit tests (no Docker needed)
+uv run pytest tests/unit -v
+
+# Run functional requirement tests (requires Cassandra)
+uv run pytest tests/functional -v
+
+# Start the API server
+uv run uvicorn src.api.main:app --reload
 ```
 
 ## Getting Started
 
-> _Coming soon — agent profiles and skills will be added as the dojo progresses._
+> _More agent profiles and skills will be added as the dojo progresses._
